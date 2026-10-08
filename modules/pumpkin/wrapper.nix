@@ -36,6 +36,14 @@
           Plugin config written to plugins/data/<name>/config.toml.
         '';
       };
+      files = mkOption {
+        type = types.attrsOf types.path;
+        default = {};
+        description = ''
+          Extra files copied into plugins/data/<name>/, keyed by relative path.
+          Example: { "config.json" = ./config.json; "plugins/hello.lua" = ./hello.lua; }
+        '';
+      };
     };
   });
 
@@ -58,6 +66,10 @@
       ${lib.optionalString (spec.settings != {}) ''
         cp ${pluginTomls.${spec.name}} "$out/plugins/data/${spec.name}/config.toml"
       ''}
+      ${lib.concatStrings (lib.mapAttrsToList (rel: src: ''
+        mkdir -p "$out/plugins/data/${spec.name}/$(dirname ${lib.escapeShellArg rel})"
+        cp ${src} "$out/plugins/data/${spec.name}/${rel}"
+      '') spec.files)}
     '') config.plugins}
   '';
 
@@ -71,6 +83,10 @@
       ${lib.optionalString (spec.settings != {}) ''
         cp -f ${pluginTomls.${spec.name}} "$data/plugins/data/${spec.name}/config.toml"
       ''}
+      ${lib.concatStrings (lib.mapAttrsToList (rel: src: ''
+        mkdir -p "$data/plugins/data/${spec.name}/$(dirname ${lib.escapeShellArg rel})"
+        cp -f ${src} "$data/plugins/data/${spec.name}/${rel}"
+      '') spec.files)}
     '') config.plugins}
     cd "$data"
   '';

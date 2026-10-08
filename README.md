@@ -47,7 +47,7 @@ PUMPKIN_DATA_DIR=./data nix run
 
 - `package` — Pumpkin derivation to wrap.
 - `settings` — attrset serialized to `pumpkin.toml`. Freeform; a few plugin keys have defaults (`enabled`, `allow_unsigned`, `verify_signatures = false`, `ask_permission_confirmation = false`, `hot_reload = false`).
-- `plugins` — list of packages or `{ package, name?, wasmName?, settings? }`. Each `.wasm` is linked to `plugins/<name>.wasm`. `settings` is written to `plugins/data/<name>/config.toml`.
+- `plugins` — list of packages or `{ package, name?, wasmName?, settings?, files? }`. Each `.wasm` is linked to `plugins/<name>.wasm`. `settings` is written to `plugins/data/<name>/config.toml`. `files` copies extra paths into that data directory (for example PLua's `config.json` and `plugins/*.lua`).
 - `dataDirEnv` — env var for the writable server dir (default `PUMPKIN_DATA_DIR`).
 
 Plugin packages should install `$out/<name>.wasm` and set `passthru.pumpkinPlugin.name`.
