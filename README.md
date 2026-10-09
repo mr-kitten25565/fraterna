@@ -1,10 +1,8 @@
 # Fraterna
 
-A flake that wraps [Pumpkin](https://github.com/Pumpkin-MC/Pumpkin) with RFC 42 `settings` and a declarative list of WASM plugin derivations.
+A flake that wraps [Pumpkin](https://github.com/Pumpkin-MC/Pumpkin) with `settings` and a declarative list of WASM plugin derivations.
 
 This is a Nix stand-in for installing plugins into `plugins/` (what `ppm install` does). It does not search the marketplace or scaffold new plugins.
-
-Pumpkin reads `pumpkin.toml` from the process working directory and writes worlds and logs there. The wrapper copies config and links plugins into `$PUMPKIN_DATA_DIR` (or `$PWD`) on each start, then `cd`s there.
 
 ## Usage
 
@@ -40,14 +38,10 @@ Pumpkin reads `pumpkin.toml` from the process working directory and writes world
 Run:
 
 ```bash
-PUMPKIN_DATA_DIR=./data nix run
+nix run
 ```
 
-### Options
+## TODO
 
-- `package` — Pumpkin derivation to wrap.
-- `settings` — attrset serialized to `pumpkin.toml`. Freeform; a few plugin keys have defaults (`enabled`, `allow_unsigned`, `verify_signatures = false`, `ask_permission_confirmation = false`, `hot_reload = false`).
-- `plugins` — list of packages or `{ package, name?, wasmName?, settings?, files? }`. Each `.wasm` is linked to `plugins/<name>.wasm`. `settings` is written to `plugins/data/<name>/config.toml`. `files` copies extra paths into that data directory (for example PLua's `config.json` and `plugins/*.lua`).
-- `dataDirEnv` — env var for the writable server dir (default `PUMPKIN_DATA_DIR`).
+- PLua plugins: accept Lua scripts as wrap entries (data under `plugins/data/plua/plugins/` plus `enabled_plugins` in `config.json`) instead of `files` on the PLua package.
 
-Plugin packages should install `$out/<name>.wasm` and set `passthru.pumpkinPlugin.name`.

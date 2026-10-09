@@ -44,6 +44,8 @@
           Example: { "config.json" = ./config.json; "plugins/hello.lua" = ./hello.lua; }
         '';
       };
+      # TODO: first-class PLua plugins — lua scripts + enabled_plugins as wrap
+      # entries, instead of stuffing them in files on the plua package.
     };
   });
 
@@ -61,16 +63,18 @@
     mkdir -p "$out/plugins/data"
     cp ${pumpkinToml} "$out/pumpkin.toml"
     ${lib.concatMapStrings (spec: ''
-      ln -s ${pluginWasm spec} "$out/plugins/${spec.wasmName}"
-      mkdir -p "$out/plugins/data/${spec.name}"
-      ${lib.optionalString (spec.settings != {}) ''
-        cp ${pluginTomls.${spec.name}} "$out/plugins/data/${spec.name}/config.toml"
-      ''}
-      ${lib.concatStrings (lib.mapAttrsToList (rel: src: ''
-        mkdir -p "$out/plugins/data/${spec.name}/$(dirname ${lib.escapeShellArg rel})"
-        cp ${src} "$out/plugins/data/${spec.name}/${rel}"
-      '') spec.files)}
-    '') config.plugins}
+        ln -s ${pluginWasm spec} "$out/plugins/${spec.wasmName}"
+        mkdir -p "$out/plugins/data/${spec.name}"
+        ${lib.optionalString (spec.settings != {}) ''
+          cp ${pluginTomls.${spec.name}} "$out/plugins/data/${spec.name}/config.toml"
+        ''}
+        ${lib.concatStrings (lib.mapAttrsToList (rel: src: ''
+            mkdir -p "$out/plugins/data/${spec.name}/$(dirname ${lib.escapeShellArg rel})"
+            cp ${src} "$out/plugins/data/${spec.name}/${rel}"
+          '')
+          spec.files)}
+      '')
+      config.plugins}
   '';
 
   setup = ''
@@ -78,16 +82,18 @@
     mkdir -p "$data/plugins/data"
     cp -f ${layout}/pumpkin.toml "$data/pumpkin.toml"
     ${lib.concatMapStrings (spec: ''
-      ln -sfn ${pluginWasm spec} "$data/plugins/${spec.wasmName}"
-      mkdir -p "$data/plugins/data/${spec.name}"
-      ${lib.optionalString (spec.settings != {}) ''
-        cp -f ${pluginTomls.${spec.name}} "$data/plugins/data/${spec.name}/config.toml"
-      ''}
-      ${lib.concatStrings (lib.mapAttrsToList (rel: src: ''
-        mkdir -p "$data/plugins/data/${spec.name}/$(dirname ${lib.escapeShellArg rel})"
-        cp -f ${src} "$data/plugins/data/${spec.name}/${rel}"
-      '') spec.files)}
-    '') config.plugins}
+        ln -sfn ${pluginWasm spec} "$data/plugins/${spec.wasmName}"
+        mkdir -p "$data/plugins/data/${spec.name}"
+        ${lib.optionalString (spec.settings != {}) ''
+          cp -f ${pluginTomls.${spec.name}} "$data/plugins/data/${spec.name}/config.toml"
+        ''}
+        ${lib.concatStrings (lib.mapAttrsToList (rel: src: ''
+            mkdir -p "$data/plugins/data/${spec.name}/$(dirname ${lib.escapeShellArg rel})"
+            cp -f ${src} "$data/plugins/data/${spec.name}/${rel}"
+          '')
+          spec.files)}
+      '')
+      config.plugins}
     cd "$data"
   '';
 in {
@@ -98,8 +104,8 @@ in {
       type = types.str;
       default = "PUMPKIN_DATA_DIR";
       description = ''
-        Environment variable naming the writable server directory (cwd for Pumpkin).
-        Falls back to the process working directory when unset.
+        Environment variable naming the writable server directory.
+        Working directory when unset.
       '';
     };
 
@@ -139,13 +145,13 @@ in {
           hot_reload = mkOption {
             type = types.bool;
             default = false;
-            description = "Watch plugins/ and hot-reload.";
+            description = "Watch plugins/hot-reload";
           };
         };
       };
       default = {};
       description = ''
-        Structural pumpkin.toml (RFC 42). Nested attrsets become TOML tables.
+        Structural pumpkin.toml
         See Pumpkin's pumpkin-config crate for keys.
       '';
     };
