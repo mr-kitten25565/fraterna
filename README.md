@@ -44,4 +44,5 @@ nix run
 ## TODO
 
 - PLua plugins: accept Lua scripts as wrap entries (data under `plugins/data/plua/plugins/` plus `enabled_plugins` in `config.json`) instead of `files` on the PLua package.
+- Unlink Store paths after use. If you add a plugin, run the server than remove the plugin it will stay linked and will still be used.
 
