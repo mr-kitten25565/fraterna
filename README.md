@@ -8,7 +8,7 @@ This is a Nix stand-in for installing plugins into `plugins/` (what `ppm install
 
 ```nix
 {
-  inputs.fraterna.url = "path:../fraterna"; # or a git URL
+  inputs.fraterna.url = "github:mr-kitten25565/fraterna";
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
   outputs = { fraterna, nixpkgs, ... }:
@@ -26,7 +26,7 @@ This is a Nix stand-in for installing plugins into `plugins/` (what `ppm install
         };
         plugins = [
           {
-            package = helloWorld; # derivation with passthru.pumpkinPlugin.name
+            package = helloWorld;
             settings.greeting = "from nix";
           }
         ];

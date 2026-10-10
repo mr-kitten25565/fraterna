@@ -44,7 +44,7 @@
           Example: { "config.json" = ./config.json; "plugins/hello.lua" = ./hello.lua; }
         '';
       };
-      # TODO: first-class PLua plugins — lua scripts + enabled_plugins as wrap
+      # TODO: first-class PLua(and other runtimes) plugins — lua scripts + enabled_plugins as wrap
       # entries, instead of stuffing them in files on the plua package.
     };
   });
